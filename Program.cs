@@ -8,18 +8,18 @@ internal class Program
 {
     public static void Main()
     {
-        bool globalFlag = false;
+        bool stopFlag = false; //этот флаг нужен для повторной работы программы в случае если пользователь не ввел q
 
         RequestForMuseumExhibit generalBase = new RequestForMuseumExhibit();
         generalBase.DataBaseFromFileBinary();
 
-        while (globalFlag == false)
+        while (stopFlag == false)
         {
             Console.WriteLine("--- Музейные экспонаты ---");
             Console.WriteLine("1. Просмотреть экспонаты");
             Console.WriteLine("2. Добавить экспонат");
             Console.WriteLine("3. Списать экспонат");
-            Console.WriteLine("4. Запрос по цене");
+            Console.WriteLine("4. Запрос по цене меньшей 5000");
             Console.WriteLine("5. Запрос по автору");
             Console.WriteLine("6. Число экспонатов до нашей эры");
             Console.WriteLine("7. Число экспонатов в музее");
@@ -41,9 +41,7 @@ internal class Program
                     string ageOfAdmission = "";
                     string price = "";
 
-                    int ageInt = 0;
-                    int ageOfAdmissionInt = 0;
-                    double priceDouble = 0;
+                    MuseumExhibit newExhibit = new MuseumExhibit();
                     while (correct == false)
                     {
                         Console.Write("Введите название экспоната: ");
@@ -56,40 +54,15 @@ internal class Program
                         ageOfAdmission = Console.ReadLine();
                         Console.Write("Введите стоимость экспоната: ");
                         price = Console.ReadLine();
-                        ageInt = 0;
-                        ageOfAdmissionInt = 0;
-                        priceDouble = 0;
 
+                        correct = newExhibit.MuseumExhibitSetting(name, age, author, ageOfAdmission, price);
 
-                        try
+                        if(correct == false)
                         {
-                            ageInt = Int32.Parse(age);
-                            try
-                            {
-                                ageOfAdmissionInt = Int32.Parse(ageOfAdmission);
-                                try
-                                {
-                                    priceDouble = Double.Parse(price);
-                                    correct = true;
-                                }
-                                catch (FormatException)
-                                {
-                                    Console.WriteLine("стоимость не число, введи еще раз");
-                                }
-
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("дата добавления не число, введи еще раз");
-                            }
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("дата не число, введи еще раз");
+                            Console.WriteLine("Где-то ошибка, введите характеристики еще раз");
                         }
                     }
 
-                    MuseumExhibit newExhibit = new MuseumExhibit(name, ageInt, author, ageOfAdmissionInt, priceDouble);
 
                     generalBase.AddToDataBase(newExhibit);
                     break;
@@ -99,25 +72,9 @@ internal class Program
 
                     generalBase.DeleteFromDataBase(name);
                     break;
-                case "4"://стоимость меньше заданной
-                    price = "";
-                    priceDouble = 0;
-                    correct = false;
-                    while (correct == false)
-                    {
-                        Console.Write("Введите стоимость экспоната: ");
-                        price = Console.ReadLine();
-                        try
-                        {
-                            priceDouble = Double.Parse(price);
-                                correct = true;
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("стоимость не число, введи еще раз: ");
-                        }
-                    }
-                    generalBase.CheckPrice(priceDouble);
+                case "4"://стоимость меньше 5000
+
+                    generalBase.CheckPrice(5000);
                     break;
 
                 case "5"://все экспонаты одного автора
@@ -134,7 +91,7 @@ internal class Program
                     break;
                 case "q"://выход
                     generalBase.DataBaseToFileBinary();
-                    globalFlag = true;
+                    stopFlag = true;
                     break;
                 default://ошибка
                     Console.WriteLine("Неверный выбор.");

@@ -1,13 +1,28 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 
 namespace lab3
 {
-    public class RequestForMuseumExhibit // класс запросов для базы
+    /// <summary>
+    ///  В классе RequestForMuseumExhibit объявлены два поля. 
+    ///  Первое – это имя файла с базой данных, а второе – словарь с ключом – именем объекта и представителем класса MuseumExhibit. 
+    ///  Дальше описаны различные методы: 
+    ///  DataBaseToFileBinary – для записи базы данных в бинарный файл, 
+    ///  DataBaseFromFileBinary – для считывания из бинарного файла базы данных, 
+    ///  ViewDataBase-просмотр базы данных, 
+    ///  AddToDataBase  - для добавления в базу элемента, 
+    ///  DeleteFromDataBase – для удаления элемента из базы по имени, 
+    ///  CheckPrice – для поиска экземпляров с ценой ниже указанной, 
+    ///  CheckAuthor – возвращает перечень элементов с одним автором, 
+    ///  CheckAge – число всех экспонатов в базе, созданных до нашей эры, 
+    ///  NumberOfExhibits – число всех экспонатов.
+    /// </summary>
+    public class RequestForMuseumExhibit 
     {
-        private const string binaryFilename = "C:/Users/алексей/Desktop/aboba.txt";//файлик менять можно только ручками
+        private const string binaryFilename = "aboba.txt";//файлик менять можно только ручками
 
         Dictionary<string, MuseumExhibit> dataBase = new Dictionary<string, MuseumExhibit>();//это словарик - база
 
@@ -19,8 +34,6 @@ namespace lab3
 
                 foreach (MuseumExhibit i in someExhibits)
                 {
-
-
                     string name = i.GetName();
                     int age = i.GetAge();
                     string author = i.GetAutorName();
@@ -56,7 +69,11 @@ namespace lab3
                             int ageOfAdmission = file.ReadInt32();
                             double price = file.ReadDouble();
 
-                            MuseumExhibit someToDataBase = new MuseumExhibit(name, age, author, ageOfAdmission, price);
+                            MuseumExhibit someToDataBase = new MuseumExhibit();
+                            string agge = age + "";
+                            string aggeOfAdmission = ageOfAdmission + "";
+                            string pricce = price + "";
+                            someToDataBase.MuseumExhibitSetting(name, agge, author, aggeOfAdmission, pricce);
 
                             dataBase.Add(name, someToDataBase);
                         }
@@ -74,9 +91,7 @@ namespace lab3
                     string[] result = { "Error" };
                     dataBase.Clear();
                 }
-
             }
-
         }
 
         public void ViewDataBase()//показать базу
@@ -120,8 +135,8 @@ namespace lab3
             }
         }
 
-        public IEnumerable<MuseumExhibit> CheckPrice(double price)//посмотреть экспонаты меняьше указанной стоимости
-        {
+        public IEnumerable<MuseumExhibit> CheckPrice(double price)//посмотреть экспонаты меньше указанной стоимости
+        { 
             var someExhibits = from p in dataBase where p.Value.GetPrice() < price select p.Value;
             if (someExhibits.Any(p => p.GetPrice()<price))
             {
@@ -140,7 +155,7 @@ namespace lab3
             return someExhibits;
         }
 
-        public IEnumerable<MuseumExhibit> CheckAuthor(string authorName)//экспанаты с одним автором
+        public IEnumerable<MuseumExhibit> CheckAuthor(string authorName)//экспонаты с одним автором
         {
             var someExhibits = from p in dataBase where p.Value.GetAutorName() == authorName select p.Value;
             if (someExhibits.Any(p => p.GetAutorName() == authorName))
